@@ -1,0 +1,7 @@
+# Requirements adjusted for Python 3.13
+# (Install Odoo reqs then this)
+Pillow==11.3.0
+greenlet==3.2.3
+gevent==25.5.1
+psycopg2==2.9.10
+legacy-cgi==2.6.3

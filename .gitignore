@@ -1,0 +1,14 @@
+/src/database_cleanup
+*.py[cod]
+*.*~
+
+*.mo
+*.pot
+
+.idea
+docs/build
+dump/*
+venv/
+
+*.conf
+*.dump
