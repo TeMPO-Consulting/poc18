@@ -60,17 +60,23 @@ class model_columns(osv.osv_memory):
             if field_data.help:
                 attributes.append(('help', f'"{self.string_cleanup(field_data.help)}"'))
             if field_data._domain:
-                attributes.append(('domain', f'{field_data._domain}'))
+                attributes.append(('domain', f'"{field_data._domain}"'))
             # Default values
             if model_obj._defaults and field_name in model_obj._defaults:
                 default_val = model_obj._defaults[field_name]
                 # Default strings need to be encased by string delimiters (contrary to ints, bools, etc...)
                 if isinstance(default_val, str):
-                    default_val = f'"{default_val}"'
+                    default_val = f'"{self.string_cleanup(default_val)}"'
                 # Check for lambdas and functions
                 if callable(default_val):
                     if default_val.__name__ == "<lambda>":
+                        # Cleanup initial field name attribute
                         default_val = inspect.getsource(default_val).split(': ', 1)[1].rstrip()
+                        # Keep only first line (see issue with sale_delay default in product.product)
+                        if "\n" in default_val:
+                            default_val = default_val.split('\n', 1)[0]
+                        # Remove potential post-lambda comments
+                        default_val = default_val.rsplit('#', 1)[0]
                     # In case a function callback is used instead of lambda. (Haven't found an instance of it yet)
                     else:
                         default_val = default_val.__name__
@@ -81,7 +87,8 @@ class model_columns(osv.osv_memory):
             is_related = field_data.__class__.__name__ == "related"
             # Selection
             if type == "selection":
-                attributes.insert(1, ('selection', f'{field_data.selection}'))
+                selection_val = field_data.selection if not callable(field_data.selection) else field_data.selection.__name__
+                attributes.insert(1, ('selection', f'{selection_val}'))
             # Float
             if type == "float" and field_data.digits:
                 attributes.insert(1, ('digits', f'{field_data.digits}'))
@@ -115,7 +122,7 @@ class model_columns(osv.osv_memory):
                 if field_data._fnct_search:
                     attributes.insert(1, ('search', f'"{field_data._fnct_search.__name__}"'))
                 if field_data._fnct_inv:
-                    attributes.insert(1, ('search', f'"{field_data._fnct_inv.__name__}"'))
+                    attributes.insert(1, ('inverse', f'"{field_data._fnct_inv.__name__}"'))
                 attributes.insert(1, ('compute', f'"{field_data._fnct.__name__}"'))
 
 
