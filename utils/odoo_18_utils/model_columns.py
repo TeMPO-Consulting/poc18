@@ -4,6 +4,20 @@ from osv import fields
 
 import inspect
 
+DATA_PLACEHOLDERS = {
+    "boolean": False,
+    "integer": 0,
+    "float": 0.0,
+    "char": "\"\"",
+    "text": "\"\"",
+    "selection": "\"\"",
+    "many2one": None,
+    "one2many": None,
+    "many2many": None,
+    "date": None,
+    "datetime": None,
+}
+
 class model_columns(osv.osv_memory):
     _name = 'model.columns'
     _rec_name = 'Model Data'
@@ -64,7 +78,7 @@ class model_columns(osv.osv_memory):
         method_list = {
             'default': set(),
             'selection': set(),
-            'compute': set(),
+            'compute': {},
             'inverse': set(),
             'search': set(),
         }
@@ -100,7 +114,7 @@ class model_columns(osv.osv_memory):
                     # In case a function callback is used instead of lambda.
                     else:
                         default_val = default_val.__name__
-                        method_list["default"].add(default_val)
+                        method_list["default"].add((default_val, type))
                 attributes.append(('default', f'{default_val}'))
 
             # Do field type specific adjustments for attributes (function -> compute, relational...)
@@ -152,7 +166,7 @@ class model_columns(osv.osv_memory):
                     attributes.insert(1, ('inverse', f'"{field_data._fnct_inv.__name__}"'))
                     method_list["inverse"].add(field_data._fnct_inv.__name__)
                 attributes.insert(1, ('compute', f'"{field_data._fnct.__name__}"'))
-                method_list["compute"].add(field_data._fnct.__name__)
+                method_list["compute"].setdefault(field_data._fnct.__name__, []).append((field_name, type, field_data.store))
 
             # Append new field definition
             fields_str += f"{field_name} = fields.{new_type}("
@@ -165,21 +179,45 @@ class model_columns(osv.osv_memory):
         res["value"]["fields"] = fields_str
 
         # Go over all method names discovered in field definitions to generate method placeholders
-        method_placeholders_str = "# Default methods\n"
-        for method_name in method_list["default"]:
-            method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
-        method_placeholders_str += "# Selection methods\n"
+        method_placeholders_str = "# Default methods\n" if method_list["default"] else ""
+        # Default methods
+        for method_info in method_list["default"]:
+            method_placeholders_str += (f"def {method_info[0]}(self):\n"
+                                        f"\t\"\"\"\"\"\"\n"
+                                        f"\treturn {DATA_PLACEHOLDERS[method_info[1]]}\n\n")
+        # Dynamic select methods
+        method_placeholders_str += "# Selection methods\n" if method_list["selection"] else ""
         for method_name in method_list["selection"]:
-            method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
-        method_placeholders_str += "# Compute methods\n"
-        for method_name in method_list["compute"]:
-            method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
-        method_placeholders_str += "# Search methods\n"
+            method_placeholders_str += (f"def {method_name}(self):\n"
+                                        f"\t\"\"\"\"\"\"\n"
+                                        f"\treturn [('option_a', 'Option A'), ('option_b', 'Option B')]\n\n")
+        # Compute methods
+        method_placeholders_str += "# Compute methods\n" if method_list["compute"] else ""
+        for method_name, method_info in method_list["compute"].items():
+            temp_method_placeholders_str = (f"def {method_name}(self):\n"
+                                        f"\t\"\"\"\"\"\"\n"
+                                        f"\tfor record in self:\n")
+            stored_compute_flag = False
+            for linked_field in method_info:
+                temp_method_placeholders_str += f"\t\trecord.{linked_field[0]} = {DATA_PLACEHOLDERS[linked_field[1]]}\n"
+                if linked_field[2]:
+                    stored_compute_flag = True
+            if stored_compute_flag:
+                temp_method_placeholders_str = f"@api.depends('')\n{temp_method_placeholders_str}"
+            method_placeholders_str += temp_method_placeholders_str + "\n"
+
+        # Search methods
+        method_placeholders_str += "# Search methods\n" if method_list["search"] else ""
         for method_name in method_list["search"]:
-            method_placeholders_str += f"def {method_name}(self, operator, value):\n\t\"\"\"\"\"\"\n\tpass\n\n"
-        method_placeholders_str += "# Inverse methods\n"
+            method_placeholders_str += (f"def {method_name}(self, operator, value):\n"
+                                        f"\t\"\"\"\"\"\"\n"
+                                        f"\treturn [('id', operator, value)]\n\n")
+        # Inverse methods for computed fields
+        method_placeholders_str += "# Inverse methods\n" if method_list["inverse"] else ""
         for method_name in method_list["inverse"]:
-            method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
+            method_placeholders_str += (f"def {method_name}(self):\n"
+                                        f"\t\"\"\"\"\"\"\n"
+                                        f"\tpass\n\n")
 
         res["value"]["placeholder_methods"] = method_placeholders_str
 
