@@ -129,7 +129,7 @@ class model_columns(osv.osv_memory):
                 attributes.insert(1, ('column1', f'"{field_data._id1}"'))
                 attributes.insert(1, ('relation', f'"{field_data._rel}"'))
             # One2many
-            if type == "one2many":
+            if type == "one2many" and not is_compute:
                 attributes.insert(1, ('inverse_name', f'"{field_data._fields_id}"'))
             # Many2one
             if type == "Many2one" and field_data.ondelete:
@@ -165,19 +165,19 @@ class model_columns(osv.osv_memory):
         res["value"]["fields"] = fields_str
 
         # Go over all method names discovered in field definitions to generate method placeholders
-        method_placeholders_str = "# Default methods\n\n"
+        method_placeholders_str = "# Default methods\n"
         for method_name in method_list["default"]:
             method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
-        method_placeholders_str += "# Selection methods\n\n"
+        method_placeholders_str += "# Selection methods\n"
         for method_name in method_list["selection"]:
             method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
-        method_placeholders_str += "# Compute methods\n\n"
+        method_placeholders_str += "# Compute methods\n"
         for method_name in method_list["compute"]:
             method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
-        method_placeholders_str += "# Search methods\n\n"
+        method_placeholders_str += "# Search methods\n"
         for method_name in method_list["search"]:
             method_placeholders_str += f"def {method_name}(self, operator, value):\n\t\"\"\"\"\"\"\n\tpass\n\n"
-        method_placeholders_str += "# Inverse methods\n\n"
+        method_placeholders_str += "# Inverse methods\n"
         for method_name in method_list["inverse"]:
             method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
 
