@@ -18,6 +18,23 @@ class model_columns(osv.osv_memory):
         result = result.replace('"', "'")
         return result
 
+    @staticmethod
+    def lambda_cleanup(lambda_obj, type):
+        result = inspect.getsource(lambda_obj)
+        # Cleanup source info prefixing the actual lambda
+        if type == "default":
+            result = result.split(': ', 1)[1]
+        elif type == "selection":
+            # Assuming lambda is the first argument before string
+            result = result.split('.selection(', 1)[1]
+            result = result.rsplit(', string', 1)[0]
+        # Remove potential extra lines
+        if "\n" in result:
+            result = result.split('\n', 1)[0]
+        # Remove potential post-lambda comments
+        result = result.rsplit('#', 1)[0]
+        return result
+
     def onchange_model_name(self, cr, uid, ids, model_name, context=None):
         """
         """
@@ -41,8 +58,16 @@ class model_columns(osv.osv_memory):
 
         # Process model columns
         columns = model_obj._columns
-        columns_str = ""
+        # String containing new fields definitions
         fields_str = ""
+        # List of method names for default,selection,compute,search and inverse methods found in field definitions
+        method_list = {
+            'default': set(),
+            'selection': set(),
+            'compute': set(),
+            'inverse': set(),
+            'search': set(),
+        }
         for field_name, field_data in columns.items():
             ## Extract field data ##
             # Type
@@ -71,15 +96,11 @@ class model_columns(osv.osv_memory):
                 if callable(default_val):
                     if default_val.__name__ == "<lambda>":
                         # Cleanup initial field name attribute
-                        default_val = inspect.getsource(default_val).split(': ', 1)[1].rstrip()
-                        # Keep only first line (see issue with sale_delay default in product.product)
-                        if "\n" in default_val:
-                            default_val = default_val.split('\n', 1)[0]
-                        # Remove potential post-lambda comments
-                        default_val = default_val.rsplit('#', 1)[0]
-                    # In case a function callback is used instead of lambda. (Haven't found an instance of it yet)
+                        default_val = self.lambda_cleanup(default_val, "default")
+                    # In case a function callback is used instead of lambda.
                     else:
                         default_val = default_val.__name__
+                        method_list["default"].add(default_val)
                 attributes.append(('default', f'{default_val}'))
 
             # Do field type specific adjustments for attributes (function -> compute, relational...)
@@ -87,7 +108,12 @@ class model_columns(osv.osv_memory):
             is_related = field_data.__class__.__name__ == "related"
             # Selection
             if type == "selection":
-                selection_val = field_data.selection if not callable(field_data.selection) else field_data.selection.__name__
+                selection_val = field_data.selection
+                if callable(selection_val) and selection_val.__name__ == "<lambda>":
+                    selection_val = self.lambda_cleanup(selection_val, "selection")
+                elif callable(selection_val):
+                    selection_val = selection_val.__name__
+                    method_list["selection"].add(selection_val)
                 attributes.insert(1, ('selection', f'{selection_val}'))
             # Float
             if type == "float" and field_data.digits:
@@ -121,11 +147,12 @@ class model_columns(osv.osv_memory):
             if is_compute:
                 if field_data._fnct_search:
                     attributes.insert(1, ('search', f'"{field_data._fnct_search.__name__}"'))
+                    method_list["search"].add(field_data._fnct_search.__name__)
                 if field_data._fnct_inv:
                     attributes.insert(1, ('inverse', f'"{field_data._fnct_inv.__name__}"'))
+                    method_list["inverse"].add(field_data._fnct_inv.__name__)
                 attributes.insert(1, ('compute', f'"{field_data._fnct.__name__}"'))
-
-
+                method_list["compute"].add(field_data._fnct.__name__)
 
             # Append new field definition
             fields_str += f"{field_name} = fields.{new_type}("
@@ -134,14 +161,38 @@ class model_columns(osv.osv_memory):
             fields_str += ")\n"
             # Remove ", " in final attribute
             fields_str = ''.join(fields_str.rsplit(', ', 1))
-
+        # Add resulting field defs to return val
         res["value"]["fields"] = fields_str
+
+        # Go over all method names discovered in field definitions to generate method placeholders
+        method_placeholders_str = "# Default methods\n\n"
+        for method_name in method_list["default"]:
+            method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
+        method_placeholders_str += "# Selection methods\n\n"
+        for method_name in method_list["selection"]:
+            method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
+        method_placeholders_str += "# Compute methods\n\n"
+        for method_name in method_list["compute"]:
+            method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
+        method_placeholders_str += "# Search methods\n\n"
+        for method_name in method_list["search"]:
+            method_placeholders_str += f"def {method_name}(self, operator, value):\n\t\"\"\"\"\"\"\n\tpass\n\n"
+        method_placeholders_str += "# Inverse methods\n\n"
+        for method_name in method_list["inverse"]:
+            method_placeholders_str += f"def {method_name}(self):\n\t\"\"\"\"\"\"\n\tpass\n\n"
+
+        res["value"]["placeholder_methods"] = method_placeholders_str
+
         # Return results
         return res
 
     _columns = {
         'fields': fields.text(
             string='Fields',
+            readonly=True,
+        ),
+        'placeholder_methods': fields.text(
+            string='Placeholder methods',
             readonly=True,
         ),
         'model_name': fields.char(

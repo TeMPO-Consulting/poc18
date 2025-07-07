@@ -11,6 +11,7 @@
                     <group col="8">
                         <field name="model_name" on_change="onchange_model_name(model_name)" colspan="8"/>
                         <field name="fields" colspan="8"/>
+                        <field name="placeholder_methods" colspan="8"/>
                     </group>
                 </form>
             </field>
