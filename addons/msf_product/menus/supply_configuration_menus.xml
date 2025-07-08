@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- # Brique Menu d'accueil -->
+    <menuitem name="Supply Configuration"
+              id="menu_supply_configuration"
+              sequence="20"
+              web_icon="msf_product,static/img/supply_configuration.png"
+              groups="base.group_user"/>
+
+    <menuitem id="supply_config_product_nomenclature_menu"
+              name="Products Nomenclature"
+              action="product_nomenclature_view_action"
+              parent="menu_supply_configuration"
+              sequence="10"/>
+</odoo>
