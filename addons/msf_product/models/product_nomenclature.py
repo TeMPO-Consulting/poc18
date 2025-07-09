@@ -9,6 +9,7 @@ _SUB_LEVELS = 6
 
 class ProductNomenclature(models.Model):
     _name = "product.nomenclature"
+    _description = "Product Nomenclature"
     _parent_name = "parent_id"
     _parent_store = True
     _rec_name = "complete_name"
@@ -29,10 +30,10 @@ class ProductNomenclature(models.Model):
     level = fields.Integer(string="Level", compute="_compute_level", store=True, recursive=True)
     type = fields.Selection(string="Nomenclature Type",
                             selection=[('mandatory', 'Mandatory'), ('optional', 'Optional')],
-                            default=lambda *a: 'mandatory', )
-    sub_level = fields.Selection(string="Sub-Level", size=256,
+                            default='mandatory')
+    sub_level = fields.Selection(string="Sub-Level",
                                  selection=[('0', '1'), ('1', '2'), ('2', '3'), ('3', '4'), ('4', '5'), ('5', '6')],
-                                 default=lambda *a: '0', )
+                                 default='0')
     number_of_products = fields.Integer(string="Number of Products", compute="_getNumberOfProducts", readonly=True)
     category_id = fields.Many2one(string="Category", compute="_get_category_id", search="_src_category_id",
                                   comodel_name="product.category", readonly=True,

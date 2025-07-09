@@ -3,6 +3,7 @@ from odoo import api, fields, models
 
 class ProductCategory(models.Model):
     _name = "product.category"
+    _description = "Product Category"
     _parent_name = "parent_id"
 
     name = fields.Char(string="Name", translate=True, size=64, required=True)

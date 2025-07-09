@@ -3,6 +3,7 @@ from odoo import api, fields, models
 
 class ProductTemplate(models.Model):
     _name = "product.template"
+    _description = "Product Template"
 
     # Default methods
     def _get_uom_id(self):
@@ -32,31 +33,31 @@ class ProductTemplate(models.Model):
     supply_method = fields.Selection(string="Supply method", selection=[('produce', 'Produce'), ('buy', 'Buy')],
                                      required=True,
                                      help="Produce will generate production order or tasks, according to the product type. Purchase will trigger purchase orders when requested.",
-                                     default=lambda *a: 'buy', )
+                                     default='buy')
     sale_delay = fields.Float(string="Customer Lead Time",
                               help="This is the average delay in days between the confirmation of the customer order and the delivery of the finished products. It's the time you promise to your customers.",
-                              default=lambda *a: 0, )
+                              default=0)
     produce_delay = fields.Float(string="Manufacturing Lead Time",
                                  help="Average delay in days to produce this product. This is only for the production order and, if it is a multi-level bill of material, it's only for the level of this product. Different lead times will be summed for all levels and purchase orders.",
-                                 default=lambda *a: 0, )
+                                 default=0)
     procure_method = fields.Selection(string="Procurement Method", selection=[('make_to_stock', 'Make to Stock'),
                                                                               ('make_to_order', 'Make to Order')],
                                       required=True,
                                       help="'Make to Stock': When needed, take from the stock or wait until re-supplying. 'Make to Order': When needed, purchase or produce for the procurement request.",
-                                      default=lambda *a: 'make_to_stock', )
+                                      default='make_to_stock')
     rental = fields.Boolean(string="Can be Rent")
     categ_id = fields.Many2one(string="Category", comodel_name="product.category", required=True,
                                help="Select category for the current product", domain="[('type','=','normal')]",
                                default=_default_category)
     standard_price = fields.Float(string="Cost Price", digits=(16, 5), required=True,
                                   help="Price of product calculated according to the selected costing method.",
-                                  default=lambda *a: 1, )
+                                  default=1)
     finance_price = fields.Float(string="Finance Cost Price", digits=(16, 5), readonly=True)
     finance_price_currency_id = fields.Many2one(readonly=True, compute="_get_finance_price_currency_id",
                                                 comodel_name="res.currency")
     list_price = fields.Float(string="Sale Price", compute="_get_list_price", store=True, digits=(16, 5), readonly=True,
                               help="Base price for computing the customer price. Sometimes called the catalog price.",
-                              default=lambda *a: 1, )
+                              default=1)
     volume = fields.Float(string="Volume", digits=(16, 5), help="The volume in dm3.")
     volume_updated = fields.Boolean(string="Volume updated (deprecated)", readonly=True, default=False)
     weight = fields.Float(string="Gross weight", digits=(16, 5), help="The gross weight in Kg.")
@@ -65,14 +66,14 @@ class ProductTemplate(models.Model):
                                    selection=[('average', 'Average Price'), ('standard', 'Standard Price')],
                                    required=True,
                                    help="Average Price: the cost price is recomputed at each reception of products.",
-                                   default=lambda *a: 'average', )
+                                   default='average')
     warranty = fields.Float(string="Warranty (months)")
     sale_ok = fields.Boolean(string="Can be Sold",
                              help="Determines if the product can be visible in the list of product within a selection from a sale order line.",
-                             default=lambda *a: 1, )
+                             default=1)
     purchase_ok = fields.Boolean(string="Can be Purchased",
                                  help="Determine if the product is visible in the list of products within a selection from a purchase order line.",
-                                 default=lambda *a: 1, )
+                                 default=1)
     # state = fields.Many2one(string="UniField Status", comodel_name="product.status", required=True,
     #                         help="Tells the user if he can use the product or not.", default=_get_valid_stat)
     uom_id = fields.Many2one(string="Default Unit Of Measure", comodel_name="uom.uom", required=True,
@@ -83,9 +84,9 @@ class ProductTemplate(models.Model):
     uos_id = fields.Many2one(string="Unit of Sale", comodel_name="uom.uom",
                              help="Used by companies that manage two units of measure: invoicing and inventory management. For example, in food industries, you will manage a stock of ham but invoice in Kg. Keep empty to use the default UOM.")
     uos_coeff = fields.Float(string="UOM -> UOS Coeff", digits=(16, 4),
-                             help="Coefficient to convert UOM to UOS uos = uom * coeff", default=lambda *a: 1.0, )
+                             help="Coefficient to convert UOM to UOS uos = uom * coeff", default=1.0)
     mes_type = fields.Selection(string="Measure Type", selection=(('fixed', 'Fixed'), ('variable', 'Variable')),
-                                required=True, default=lambda *a: 'fixed', )
+                                required=True, default='fixed')
     seller_delay = fields.Integer(string="Supplier Lead Time", compute="_calc_seller", readonly=True,
                                   help="This is the average delay in days between the purchase order confirmation and the reception of goods for this product and for the default supplier. It is used by the scheduler to order requests based on reordering delays.")
     seller_qty = fields.Float(string="Supplier Quantity", compute="_calc_seller", digits=(16, 2), readonly=True,
@@ -100,9 +101,7 @@ class ProductTemplate(models.Model):
     loc_row = fields.Char(string="Row", size=16)
     loc_case = fields.Char(string="Case", size=16)
     company_id = fields.Many2one(string="Company", comodel_name="res.company",
-                                 default=lambda s, cr, uid, c: s.pool.get('res.company')._company_default_get(cr, uid,
-                                                                                                              'product.template',
-                                                                                                              context=c), )
+                                 default=lambda self: self.env.company)
     # taxes_id = fields.Many2many(string="Customer Taxes", comodel_name="account.tax", relation="product_taxes_rel",
     #                             column1="prod_id", column2="tax_id",
     #                             domain="[('parent_id', '=', False), ('type_tax_use', 'in', ['sale', 'all'])]")
@@ -177,7 +176,7 @@ class ProductTemplate(models.Model):
     subtype = fields.Selection(string="Product SubType",
                                selection=[('single', 'Single Item'), ('kit', 'Kit/Module'), ('asset', 'Asset')],
                                required=True, help="Will change the way procurements are processed.",
-                               default=lambda *a: 'single', )
+                               default='single')
     # asset_type_id = fields.Many2one(string="Asset Type", comodel_name="product.asset.type")
 
     # Compute methods

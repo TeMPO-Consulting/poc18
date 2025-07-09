@@ -3,6 +3,7 @@ from odoo import api, fields, models
 
 class ProductProduct(models.Model):
     _name = "product.product"
+    _description = "Product"
     _inherits = {'product.template': 'product_tmpl_id'}
     _order = 'default_code,name_template'
 
@@ -24,13 +25,13 @@ class ProductProduct(models.Model):
                             help="If the active field is set to False, it will allow you to hide the product without removing it.",
                             default=lambda *a: True, )
     variants = fields.Char(string="Variants", size=64)
-    product_tmpl_id = fields.Many2one(string="Product Template", comodel_name="product.template", required=True)
+    product_tmpl_id = fields.Many2one(string="Product Template", comodel_name="product.template", required=True, ondelete="cascade")
     ean13 = fields.Char(string="EAN13", size=13)
     # packaging = fields.One2many(string="Logistical Units", comodel_name="product.packaging", inverse_name="product_id",
     #                             help="Gives the different ways to package the same product. This has no impact on the picking order and is mainly used if you use the EDI module.")
-    price_extra = fields.Float(string="Variant Price Extra", digits=(16, 2), default=lambda *a: 0.0, )
-    price_margin = fields.Float(string="Variant Price Margin", digits=(16, 2), default=lambda *a: 1.0, )
-    pricelist_id = fields.Many2one(string="Pricelist", comodel_name="product.pricelist")
+    price_extra = fields.Float(string="Variant Price Extra", digits=(16, 2), default=0.0)
+    price_margin = fields.Float(string="Variant Price Margin", digits=(16, 2), default=1.0)
+    # pricelist_id = fields.Many2one(string="Pricelist", comodel_name="product.pricelist")
     name_template = fields.Char(related="product_tmpl_id.name")
     expected_prod_creator = fields.Boolean(string="Expected Product Creator for Product Mass Update",
                                            compute="_get_expected_prod_creator", search="_expected_prod_creator_search",
@@ -44,12 +45,16 @@ class ProductProduct(models.Model):
                                     help="Forces to specify a Production Lot for all moves containing this product and coming from a Supplier Location")
     track_outgoing = fields.Boolean(string="Track Outgoing Lots",
                                     help="Forces to specify a Production Lot for all moves containing this product and going to a Customer Location")
-    location_id = fields.Many2one(string="Stock Location", comodel_name="stock.location")
+    # location_id = fields.Many2one(string="Stock Location", comodel_name="stock.location")
     valuation = fields.Selection(string="Inventory Valuation", selection=[('manual_periodic', 'Periodical (manual)'),
                                                                           ('real_time', 'Real Time (automated)')],
                                  required=True,
-                                 help="If real-time valuation is enabled for a product, the system will automatically write journal entries corresponding to stock moves.The inventory variation account set on the product category will represent the current inventory value, and the stock input and stock output account will hold the counterpart moves for incoming and outgoing products.",
-                                 default=lambda *a: 'manual_periodic', )
+                                 help="If real-time valuation is enabled for a product, the system will automatically "
+                                      "write journal entries corresponding to stock moves.The inventory variation "
+                                      "account set on the product category will represent the current inventory value, "
+                                      "and the stock input and stock output account will hold the counterpart moves for"
+                                      " incoming and outgoing products.",
+                                 default='manual_periodic')
     manufacturer = fields.Many2one(string="Manufacturer", comodel_name="res.partner")
     manufacturer_pname = fields.Char(string="Manufacturer Product Name", size=64)
     manufacturer_pref = fields.Char(string="Manufacturer Product Code", size=64)
@@ -63,11 +68,11 @@ class ProductProduct(models.Model):
                                   help="The number of months before a production lot should be removed.")
     alert_time = fields.Integer(string="Product Alert Time",
                                 help="The number of months after which an alert should be notified about the production lot.")
-    donation_expense_account = fields.Many2one(string="Donation Account", comodel_name="account.account")
+    # donation_expense_account = fields.Many2one(string="Donation Account", comodel_name="account.account")
     fnct_categ_id = fields.Many2one(string="Category", compute="_get_categ", search="_search_categ",
                                     comodel_name="product.category", readonly=True)
-    list_ids = fields.Many2many(string="Lists", compute="_get_list_sublist", search="_search_list_sublist",
-                                comodel_name="product.list", readonly=True)
+    # list_ids = fields.Many2many(string="Lists", compute="_get_list_sublist", search="_search_list_sublist",
+    #                             comodel_name="product.list", readonly=True)
     msfid = fields.Integer(string="MSFID", help="Hidden field for UniData")
     xmlid_code = fields.Char(string="Xmlid Code", size=18)
     sdref = fields.Char(string="SDref", compute="_get_sdref", search="_search_sdref", size=256, readonly=True)
@@ -112,9 +117,9 @@ class ProductProduct(models.Model):
     options_ids = fields.Many2many(string="Options", comodel_name="product.product", relation="product_options_rel",
                                    column1="product_id", column2="product_option_id")
     is_kc = fields.Boolean(string="Is Cold Chain ?", compute="_compute_kc_dg_cs_ssl_values", store=True, readonly=True)
-    heat_sensitive_item = fields.Many2one(string="Temperature sensitive item", comodel_name="product.heat_sensitive",
-                                          required=True)
-    cold_chain = fields.Many2one(string="Thermosensitivity", comodel_name="product.cold_chain")
+    # heat_sensitive_item = fields.Many2one(string="Temperature sensitive item", comodel_name="product.heat_sensitive",
+    #                                       required=True)
+    # cold_chain = fields.Many2one(string="Thermosensitivity", comodel_name="product.cold_chain")
     show_cold_chain = fields.Boolean(string="Show cold chain")
     options_ids_inv = fields.Many2many(string="Options Inv.", comodel_name="product.product",
                                        relation="product_options_rel", column1="product_option_id",
@@ -123,7 +128,7 @@ class ProductProduct(models.Model):
                                   required=True, default="no")
     single_use = fields.Selection(string="Single Use", selection=[('yes', 'Yes'), ('no', 'No'), ('no_know', 'tbd')],
                                   required=True, default="no")
-    justification_code_id = fields.Many2one(string="Justification Code", comodel_name="product.justification.code")
+    # justification_code_id = fields.Many2one(string="Justification Code", comodel_name="product.justification.code")
     med_device_class = fields.Selection(string="Medical Device Class",
                                         selection=[('', ''), ('I', 'Class I (General controls)'),
                                                    ('II', 'Class II (General control with special controls)'),
@@ -141,7 +146,7 @@ class ProductProduct(models.Model):
                                        selection=[('False', 'No'), ('True', 'Yes'), ('no_know', 'tbd')], required=True,
                                        default="False")
     restricted_country = fields.Boolean(string="Restricted in the Country", default=False)
-    country_restriction = fields.Many2one(string="Country Restriction", comodel_name="res.country.restriction")
+    # country_restriction = fields.Many2one(string="Country Restriction", comodel_name="res.country.restriction")
     state_ud = fields.Selection(string="UniData Status", selection=[('valid', 'Valid'), ('outdated', 'Outdated'),
                                                                     ('discontinued', 'Discontinued'),
                                                                     ('phase_out', 'Phase Out'), ('stopped', 'Stopped'),
@@ -160,11 +165,9 @@ class ProductProduct(models.Model):
     gmdn_code = fields.Char(string="GMDN Code", size=5)
     gmdn_description = fields.Char(string="GMDN Description", size=64)
     currency_id = fields.Many2one(string="Currency", comodel_name="res.currency", readonly=True,
-                                  default=lambda obj, cr, uid, c: obj.pool.get('res.users').browse(cr, uid,
-                                                                                                   uid).company_id.currency_id.id, )
+                                  default=lambda self: self.env.company.currency_id)
     field_currency_id = fields.Many2one(string="Currency", comodel_name="res.currency", readonly=True,
-                                        default=lambda obj, cr, uid, c: obj.pool.get('res.users').browse(cr, uid,
-                                                                                                         uid).company_id.currency_id.id, )
+                                        default=lambda self: self.env.company.currency_id)
     nomen_ids = fields.Many2many(string="Nomenclatures", compute="_get_nomen", search="_search_nomen",
                                  comodel_name="product.nomenclature", readonly=True)
     controlled_substance = fields.Selection(string="Controlled substance",
@@ -194,7 +197,7 @@ class ProductProduct(models.Model):
     form_value = fields.Text(string="Form", translate=True)
     fit_value = fields.Text(string="Fit", translate=True)
     function_value = fields.Text(string="Function", translate=True)
-    standard_ok = fields.Selection(string="Standardization Level", size=20,
+    standard_ok = fields.Selection(string="Standardization Level",
                                    selection=[('standard', 'Standard'), ('non_standard', 'Non-standard'),
                                               ('non_standard_local', 'Non-standard Local')], required=True,
                                    default="non_standard")
@@ -211,9 +214,9 @@ class ProductProduct(models.Model):
     soq_volume = fields.Float(string="SoQ Volume", digits=(16, 5))
     soq_quantity = fields.Float(string="SoQ Quantity", digits=(16, 2),
                                 help="Standard Ordering Quantity. Quantity according to which the product should be ordered. The SoQ is usually determined by the typical packaging of the product.")
-    vat_ok = fields.Boolean(string="VAT OK", compute="_get_vat_ok", readonly=True,
-                            default=lambda obj, cr, uid, c: obj.pool.get('unifield.setup.configuration').get_config(cr,
-                                                                                                                    uid).vat_ok, )
+    # vat_ok = fields.Boolean(string="VAT OK", compute="_get_vat_ok", readonly=True,
+    #                         default=lambda obj, cr, uid, c: obj.pool.get('unifield.setup.configuration').get_config(cr,
+    #                                                                                                                 uid).vat_ok, )
     nsl_merged = fields.Boolean(string="UD / NSL merged", compute="_get_nsl_merged", readonly=True)
     replace_product_id = fields.Many2one(string="Merged from", comodel_name="product.product")
     replaced_by_product_id = fields.Many2one(string="Merged to", comodel_name="product.product")
@@ -266,7 +269,7 @@ class ProductProduct(models.Model):
                                                     search="_search_incompatible_oc_default_values", readonly=True)
     procure_delay = fields.Float(string="Procurement Lead Time", digits=(16, 2),
                                  help="It's the default time to procure this product. This lead time will be used on the Order cycle procurement computation",
-                                 default=lambda *a: 60, )
+                                 default=60)
     monthly_consumption = fields.Float(string="Real Consumption", compute="compute_mac", digits=(16, 2), readonly=True)
     product_amc = fields.Float(string="Monthly consumption", compute="_compute_product_amc", digits=(16, 2),
                                readonly=True)
