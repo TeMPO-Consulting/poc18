@@ -8,7 +8,7 @@ class ProductTemplate(models.Model):
     # Default methods
     def _get_uom_id(self):
         """"""
-        return None
+        return self.env.ref("uom.")
 
     def _default_category(self):
         """"""
@@ -46,18 +46,22 @@ class ProductTemplate(models.Model):
                                       help="'Make to Stock': When needed, take from the stock or wait until re-supplying. 'Make to Order': When needed, purchase or produce for the procurement request.",
                                       default='make_to_stock')
     rental = fields.Boolean(string="Can be Rent")
-    categ_id = fields.Many2one(string="Category", comodel_name="product.category", required=True,
-                               help="Select category for the current product", domain="[('type','=','normal')]",
-                               default=_default_category)
-    standard_price = fields.Float(string="Cost Price", digits=(16, 5), required=True,
+    # categ_id = fields.Many2one(string="Category", comodel_name="product.category", required=True,
+    #                            help="Select category for the current product", domain="[('type','=','normal')]",
+    #                            default=_default_category)
+    standard_price = fields.Monetary(string="Cost Price", required=True,
                                   help="Price of product calculated according to the selected costing method.",
-                                  default=1)
-    finance_price = fields.Float(string="Finance Cost Price", digits=(16, 5), readonly=True)
+                                  default=1, currency_field="currency_id")
+    currency_id = fields.Many2one(string="Currency", comodel_name="res.currency", readonly=True,
+                                  default=lambda self: self.env.company.currency_id)
+    finance_price = fields.Monetary(string="Finance Cost Price", readonly=True, currency_field="finance_price_currency_id")
     finance_price_currency_id = fields.Many2one(readonly=True, compute="_get_finance_price_currency_id",
                                                 comodel_name="res.currency")
-    list_price = fields.Float(string="Sale Price", compute="_get_list_price", store=True, digits=(16, 5), readonly=True,
+    list_price = fields.Monetary(string="Sale Price", compute="_get_list_price", store=True, readonly=True,
                               help="Base price for computing the customer price. Sometimes called the catalog price.",
-                              default=1)
+                              default=1, currency_field="field_currency_id")
+    field_currency_id = fields.Many2one(string="Currency", comodel_name="res.currency", readonly=True,
+                                        default=lambda self: self.env.company.currency_id)
     volume = fields.Float(string="Volume", digits=(16, 5), help="The volume in dm3.")
     volume_updated = fields.Boolean(string="Volume updated (deprecated)", readonly=True, default=False)
     weight = fields.Float(string="Gross weight", digits=(16, 5), help="The gross weight in Kg.")
@@ -182,8 +186,9 @@ class ProductTemplate(models.Model):
     # Compute methods
     def _get_finance_price_currency_id(self):
         """"""
+        currency = self.env.company.currency_id
         for record in self:
-            record.finance_price_currency_id = None
+            record.finance_price_currency_id = currency
 
     # @api.depends('')
     def _get_list_price(self):

@@ -9,17 +9,160 @@
             <form string="" >
                 <sheet>
                     <!-- Main Fields -->
-                    <group name="Codes">
-                        <field name="default_code" />
-                        <field name="new_code" />
-                    </group>
-                    <group name="Description">
-                        <field name="name" />
-                        <field name="old_code" />
+                    <group>
+                        <group string="Codes">
+                            <field name="default_code" />
+                            <field name="new_code" />
+                        </group>
+                        <group string="Description">
+                            <field name="name" />
+                            <field name="old_code" />
+                        </group>
                     </group>
                     <!-- Notebook -->
                     <notebook>
                         <page string="Information">
+                            <group>
+                                <group string="Procurements">
+                                    <field name="type" />
+                                    <field name="subtype" />
+                                    <field name="procure_method" />
+                                    <field name="supply_method" />
+                                </group>
+                                <group string="Base Prices">
+                                    <field name="cost_method" />
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="standard_price" widget="monetary"/>
+                                    <field name="field_currency_id" invisible="1"/>
+                                    <field name="list_price" widget="monetary"/>
+                                    <field name="finance_price_currency_id" invisible="1"/>
+                                    <field name="finance_price" widget="monetary"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Weights">
+                                </group>
+                                <group string="Status">
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Stocks">
+                                </group>
+                                <group string="Quality">
+                                </group>
+                            </group>
+                            <group>
+                                <group/>
+                                <group string="UOM">
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Nomenclature">
+                            <group>
+                                <group string="Mandatory Levels" >
+                                </group>
+                                <group string="Optional Levels">
+                                </group>
+                            </group>
+                        </page>
+                        <page string="UD OC Validation">
+                        </page>
+                        <page string="Dates">
+                            <group>
+                                <group>
+                                    <field name="life_time" />
+                                    <field name="use_time" />
+                                </group>
+                                <group>
+                                    <field name="short_shelf_life" />
+                                    <field name="alert_time" />
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Specific info">
+                            <group>
+                                <group string="Quality" >
+                                </group>
+                                <group string="Diffusion">
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Transport">
+                                </group>
+                                <group/>
+                            </group>
+                            <group>
+                                <group string="Form" >
+                                </group>
+                                <group string="Fit">
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Function">
+                                </group>
+                                <group/>
+                            </group>
+                        </page>
+                        <page string="Miscellaneous">
+                            <group>
+                                <group string="Information" >
+                                </group>
+                                <group/>
+                            </group>
+                            <group>
+                                <group string="Lists/Sublists">
+                                </group>
+                                <group string="Code remarks section">
+                                </group>
+                            </group>
+                            <group string="Associated products">
+
+                            </group>
+                        </page>
+                        <page string="Suppliers">
+                        </page>
+                        <page string="Descriptions">
+                            <group string="Description">
+
+                            </group>
+                            <group string="Description">
+
+                            </group>
+                            <group string="Field Description">
+
+                            </group>
+                            <group string="Purchase Description">
+
+                            </group>
+                        </page>
+                        <page string="Procurement &amp; Locations">
+                            <group>
+                                <group string="Delays" >
+                                </group>
+                                <group/>
+                            </group>
+                            <group>
+                                <group string="Counter-Part Locations Properties" >
+                                </group>
+                                <group/>
+                            </group>
+                        </page>
+                        <page string="Accounting">
+                            <group string="Inventory Valuation">
+
+                            </group>
+                            <group>
+                                <group string="Field Orders Properties">
+
+                                </group>
+                                <group string="Purchase Properties"></group>
+                            </group>
+                            <group string="Purchase Taxes">
+
+                            </group>
+                            <group string="Donation Properties">
+
+                            </group>
                         </page>
                     </notebook>
                 </sheet>

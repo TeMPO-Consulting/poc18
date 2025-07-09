@@ -69,8 +69,8 @@ class ProductProduct(models.Model):
     alert_time = fields.Integer(string="Product Alert Time",
                                 help="The number of months after which an alert should be notified about the production lot.")
     # donation_expense_account = fields.Many2one(string="Donation Account", comodel_name="account.account")
-    fnct_categ_id = fields.Many2one(string="Category", compute="_get_categ", search="_search_categ",
-                                    comodel_name="product.category", readonly=True)
+    # fnct_categ_id = fields.Many2one(string="Category", compute="_get_categ", search="_search_categ",
+    #                                 comodel_name="product.category", readonly=True)
     # list_ids = fields.Many2many(string="Lists", compute="_get_list_sublist", search="_search_list_sublist",
     #                             comodel_name="product.list", readonly=True)
     msfid = fields.Integer(string="MSFID", help="Hidden field for UniData")
@@ -164,10 +164,6 @@ class ProductProduct(models.Model):
     hs_code = fields.Char(string="HS Code", size=12, readonly=True)
     gmdn_code = fields.Char(string="GMDN Code", size=5)
     gmdn_description = fields.Char(string="GMDN Description", size=64)
-    currency_id = fields.Many2one(string="Currency", comodel_name="res.currency", readonly=True,
-                                  default=lambda self: self.env.company.currency_id)
-    field_currency_id = fields.Many2one(string="Currency", comodel_name="res.currency", readonly=True,
-                                        default=lambda self: self.env.company.currency_id)
     nomen_ids = fields.Many2many(string="Nomenclatures", compute="_get_nomen", search="_search_nomen",
                                  comodel_name="product.nomenclature", readonly=True)
     controlled_substance = fields.Selection(string="Controlled substance",
