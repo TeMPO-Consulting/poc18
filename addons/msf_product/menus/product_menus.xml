@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- # Brique Menu d'accueil -->
+    <!-- # Home menu tile -->
     <menuitem name="Products"
               id="menu_products"
               sequence="20"

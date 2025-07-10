@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- # Home menu block -->
+    <!-- # Home menu tile -->
     <menuitem name="Supply Configuration"
               id="menu_supply_configuration"
               sequence="20"
