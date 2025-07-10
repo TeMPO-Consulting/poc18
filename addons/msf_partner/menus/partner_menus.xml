@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- # Home menu tile -->
+    <menuitem name="Partners"
+              id="menu_partners"
+              sequence="20"
+              web_icon="msf_partner,static/img/partners.png"
+              groups="base.group_user"/>
+    
+    <!-- Suppliers -->
+    <menuitem id="suppliers_menu"
+              name="Suppliers"
+              action="res_partner_suppliers_view_action"
+              parent="menu_partners"
+              sequence="10"/>
+    <!-- Customers -->
+    <menuitem id="customers_menu"
+              name="Customers"
+              action="res_partner_customers_view_action"
+              parent="menu_partners"
+              sequence="20"/>
+    <!-- Other/Manufacturer -->
+    <menuitem id="other_manufacturer_menu"
+              name="Other/Manufacturer"
+              action="res_partner_other_manufacturer_view_action"
+              parent="menu_partners"
+              sequence="30"/>
+</odoo>

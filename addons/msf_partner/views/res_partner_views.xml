@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="res_partner_view_list" model="ir.ui.view">
+        <field name="name">res.partner.view.list</field>
+        <field name="model">res.partner</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list string="" >
+                <!-- Fields -->
+                <field name="name"/>
+                <field name="ref"/>
+                <field name="partner_type"/>
+                <field name="valide_until_date"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="city"/>
+                <field name="country"/>
+                <field name="zone"/>
+                <field name="catalogue_bool"/>
+                <field name="supplier_lt" string="Supplier LT"/>
+                <field name="customer_lt" string="Customer LT"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="res_partner_view_form" model="ir.ui.view">
+        <field name="name">res.partner.view.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="" >
+                <sheet>
+                    <!-- Main Fields -->
+                    <group col="5">
+                        <group colspan="2">
+                            <field name="name" />
+                            <field name="legal_name" />
+                            <field name="po_by_project" />
+                        </group>
+                        <group>
+                            <field name="ref" />
+                            <field name="zone" />
+                            <field name="lang" />
+                        </group>
+                        <group>
+                            <field name="partner_type" />
+                            <field name="active" />
+                        </group>
+                        <group>
+                            <field name="customer" />
+                            <field name="supplier" />
+                            <field name="manufacturer" />
+                            <field name="transporter" />
+                        </group>
+                    </group>
+                    <!-- Notebook -->
+                    <notebook>
+                        <page string="General">
+                            <field name="instance_creator" />
+                            <group string="All Addresses">
+                                <field name="address" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="type" string="Type"/>
+                                        <field name="name"/>
+                                        <field name="office_name"/>
+                                        <field name="street"/>
+                                        <field name="street2"/>
+                                        <field name="zip"/>
+                                        <field name="city"/>
+                                        <field name="country_id" completion="1"/>
+                                        <field name="state_id"/>
+                                        <field name="phone"/>
+                                        <field name="mobile"/>
+                                        <field name="fax"/>
+                                        <field name="email"/>
+                                        <field name="title" widget="selection"/>
+                                        <field name="function"/>
+                                        <field name="active"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Categories">
+                                <field name="category_id" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page string="Field orders &amp; Purchases">
+                            <group>
+                                <group string="Purchase Properties">
+                                    <!--                                    <field name="property_product_pricelist_purchase" string="Purchase Default Currency"-->
+                                    <!--                                           domain="[('type', '=', 'purchase'), ('in_search', '=', partner_type)]"-->
+                                    <!--                                           required="1" />-->
+                                </group>
+                                <group string="Field Orders Properties">
+                                    <!--                                    <field name="property_product_pricelist" string="Field Orders Default Currency"-->
+                                    <!--                                           domain="[('type', '=', 'sale'), ('in_search', '=', partner_type)]"-->
+                                    <!--                                           required="1" />-->
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Default Lead Times (days)">
+                                    <field name="supplier_lt" invisible="supplier == False"
+                                           required="supplier == True"/>
+                                    <field name="transport_0" />
+                                    <field name="transport_0_lt"/>
+                                    <field name="transport_1" />
+                                    <field name="transport_1_lt" />
+                                    <field name="transport_2" />
+                                    <field name="transport_2_lt" />
+                                    <field name="procurement_lt"/>
+                                    <field name="customer_lt" invisible="customer == False"
+                                           required="customer == True"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Inventory Properties">
+                                    <!--                                    <field name="property_stock_customer" domain="[('usage','=','customer')]" />-->
+                                    <!--                                    <field name="property_stock_supplier" domain="[('usage','=','supplier')]" />-->
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Catalogues">
+                            <!--                            <field name="catalogue_ids" nolabel="1" colspan="4" mode="tree,form" readonly="0">-->
+                            <!--	                    		<tree string="Catalogues" hide_new_button="1" editable="top" noteditable="1">-->
+                            <!--	                    			<button name="edit_catalogue" type="object" string="Edit catalogue" icon="gtk-edit" />-->
+                            <!--	                    			<field name="name" />-->
+                            <!--	                    			<field name="period_from" />-->
+                            <!--	                    			<field name="period_to" />-->
+                            <!--	                    			<field name="currency_id" />-->
+                            <!--	                    			<button name="open_lines" type="object" string="Open catalogue" icon="terp-stock_zoom" />-->
+                            <!--	                    		</tree>-->
+                            <!--	                    	</field>-->
+                        </page>
+                        <page string="Claims">
+                            <!--                            <field name="claim_ids_res_partner" nolabel="1" colspan="4" mode="tree,form" readonly="True" />-->
+                        </page>
+                        <page string="Accounting">
+                            <group>
+                                <group string="Customer Accounting Properties">
+                                    <!--                                    <field name="property_account_receivable" groups="base.group_extended" required="1" />-->
+                                    <!--                                    <field name="property_account_position" widget="selection"/>-->
+                                    <!--                                    <field name="property_payment_term" widget="selection"/>-->
+                                </group>
+                                <group string="Supplier Accounting Properties">
+                                    <!--                                    <field name="property_account_payable" groups="base.group_extended" required="1"/>-->
+                                </group>
+                                <group string="Customer Credit">
+                                    <field name="credit"/>
+                                    <field name="credit_limit" groups="base.group_extended"/>
+                                </group>
+                                <group string="Supplier Debit">
+                                    <field name="debit"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="bank_ids" />
+                            </group>
+                            <group>
+                                <!--                                <field name="donation_payable_account" />-->
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="comment" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="res_partner_view_search" model="ir.ui.view">
+        <field name="name">res.partner.view.search</field>
+        <field name="model">res.partner</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Partners" >
+                <filter name="filter_suppliers" string="Suppliers" domain="[('supplier','=',True)]"
+                        help="Show only suppliers"/>
+                <filter name="filter_customers" string="Suppliers" domain="[('customer','=',True)]"
+                        help="Show only customers"/>
+                <filter name="filter_manufacturers" string="Suppliers" domain="[('manufacturer','=',True)]"
+                        help="Show only manufacturers"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- View Actions -->
+    <record id="res_partner_suppliers_view_action" model="ir.actions.act_window">
+        <field name="name">Suppliers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_suppliers': True}</field>
+        <field name="search_view_id" ref="res_partner_view_search"/>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+               (0, 0, {'view_mode': 'form', 'view_id': ref('res_partner_view_form')}),
+               (0, 0, {'view_mode': 'list', 'view_id': ref('res_partner_view_list')})]"/>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="res_partner_customers_view_action" model="ir.actions.act_window">
+        <field name="name">Customers</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_customers': True}</field>
+        <field name="search_view_id" ref="res_partner_view_search"/>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+               (0, 0, {'view_mode': 'form', 'view_id': ref('res_partner_view_form')}),
+               (0, 0, {'view_mode': 'list', 'view_id': ref('res_partner_view_list')})]"/>
+    </record>
+
+    <record id="res_partner_other_manufacturer_view_action" model="ir.actions.act_window">
+        <field name="name">Other/Manufacturer</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_filter_manufacturers': True}</field>
+        <field name="search_view_id" ref="res_partner_view_search"/>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+               (0, 0, {'view_mode': 'form', 'view_id': ref('res_partner_view_form')}),
+               (0, 0, {'view_mode': 'list', 'view_id': ref('res_partner_view_list')})]"/>
+    </record>
+
+</odoo>
