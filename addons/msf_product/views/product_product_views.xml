@@ -41,31 +41,64 @@
                             </group>
                             <group>
                                 <group string="Weights">
+                                    <field name="volume" readonly="type == 'service'"/>
+                                    <field name="soq_volume" readonly="type == 'service'"/>
+                                    <field name="weight" readonly="type == 'service'"/>
+                                    <field name="soq_weight" readonly="type == 'service'"/>
                                 </group>
                                 <group string="Status">
+                                    <field name="int_status_code" invisible="1" />
+                                    <field name="standard_ok"/>
+                                    <field name="state_ud" />
+                                    <field name="oc_subscription" readonly="1" invisible="int_status_code != 'unidata'"/>
+                                    <field name="golden_status" invisible="1" />
                                 </group>
                             </group>
                             <group>
                                 <group string="Stocks">
+                                    <field name="qty_available" />
+                                    <field name="virtual_available" />
+                                    <field name="product_amc" />
+                                    <field name="reviewed_consumption" />
                                 </group>
                                 <group string="Quality">
+                                    <field name="perishable" />
+                                    <field name="batch_management" />
                                 </group>
                             </group>
                             <group>
                                 <group/>
                                 <group string="UOM">
+                                    <field name="soq_quantity" />
+                                    <field name="uom_id" />
+                                    <field name="uom_po_id" />
                                 </group>
                             </group>
                         </page>
                         <page string="Nomenclature">
                             <group>
                                 <group string="Mandatory Levels" >
+                                    <field name="nomen_manda_0" />
+                                    <field name="nomen_manda_1" />
+                                    <field name="nomen_manda_2" />
+                                    <field name="nomen_manda_3" />
                                 </group>
                                 <group string="Optional Levels">
+                                    <field name="nomen_sub_0" />
+                                    <field name="nomen_sub_1" />
+                                    <field name="nomen_sub_2" />
+                                    <field name="nomen_sub_3" />
+                                    <field name="nomen_sub_4" />
+                                    <field name="nomen_sub_5" />
                                 </group>
                             </group>
                         </page>
                         <page string="UD OC Validation">
+                            <group>
+                                <field name="mml_status" />
+                                <field name="msl_status" />
+                                <field name="oc_devalidation_reason" />
+                            </group>
                         </page>
                         <page string="Dates">
                             <group>
@@ -81,24 +114,36 @@
                         </page>
                         <page string="Specific info">
                             <group>
-                                <group string="Quality" >
+                                <group string="Quality">
+                                    <!--                                    <field name="heat_sensitive_item" />-->
+                                    <field name="sterilized" />
+                                    <field name="single_use" />
+                                    <field name="controlled_substance" />
                                 </group>
                                 <group string="Diffusion">
+                                    <!--                                    <field name="justification_code_id" />-->
+                                    <field name="closed_article" />
                                 </group>
                             </group>
                             <group>
                                 <group string="Transport">
+                                    <field name="dangerous_goods" />
+                                    <field name="un_code" />
+                                    <field name="hs_code" />
                                 </group>
                                 <group/>
                             </group>
                             <group>
                                 <group string="Form" >
+                                    <field name="form_value" />
                                 </group>
                                 <group string="Fit">
+                                    <field name="fit_value" />
                                 </group>
                             </group>
                             <group>
                                 <group string="Function">
+                                    <field name="function_value" />
                                 </group>
                                 <group/>
                             </group>
@@ -106,6 +151,8 @@
                         <page string="Miscellaneous">
                             <group>
                                 <group string="Information" >
+                                    <field name="criticism" />
+                                    <field name="abc_class" />
                                 </group>
                                 <group/>
                             </group>
@@ -116,28 +163,30 @@
                                 </group>
                             </group>
                             <group string="Associated products">
-
+                                <field name="options_ids" nolabel="1"/>
                             </group>
                         </page>
                         <page string="Suppliers">
                         </page>
                         <page string="Descriptions">
                             <group string="Description">
-
+                                <field name="product_catalog_path" widget="url"/>
                             </group>
                             <group string="Description">
-
+                                <field name="description" colspan="4" nolabel="1"/>
+                                <field name="description2" colspan="4" nolabel="1"/>
                             </group>
                             <group string="Field Description">
-
+                                <field name="description_sale" nolabel="1"/>
                             </group>
                             <group string="Purchase Description">
-
+                                <field name="description_sale" nolabel="1"/>
                             </group>
                         </page>
                         <page string="Procurement &amp; Locations">
                             <group>
                                 <group string="Delays" >
+                                    <field name="procure_delays" />
                                 </group>
                                 <group/>
                             </group>
@@ -149,7 +198,7 @@
                         </page>
                         <page string="Accounting">
                             <group string="Inventory Valuation">
-
+                                <field name="valuation" />
                             </group>
                             <group>
                                 <group string="Field Orders Properties">
