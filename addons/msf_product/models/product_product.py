@@ -553,3 +553,16 @@ class ProductProduct(models.Model):
     def _write_imp_product_qty(self):
         """"""
         pass
+
+    # Onchange methods
+    @api.onchange('nomen_manda_0')
+    def _onchange_nomen_manda_0(self):
+        self.nomen_manda_1 = None
+
+    @api.onchange('nomen_manda_1')
+    def _onchange_nomen_manda_1(self):
+        self.nomen_manda_2 = None
+
+    @api.onchange('nomen_manda_2')
+    def _onchange_nomen_manda_2(self):
+        self.nomen_manda_3 = None

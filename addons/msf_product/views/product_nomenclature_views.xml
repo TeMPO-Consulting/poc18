@@ -8,13 +8,6 @@
         <field name="arch" type="xml">
             <form string="" >
                 <sheet>
-                    <!-- Title -->
-                    <div class="oe_title">
-                        <label for="name"/>
-                        <h3>
-                            <field name="name"/>
-                        </h3>
-                    </div>
                     <!-- Main Fields -->
                     <group>
                         <field name="name" />

@@ -78,10 +78,17 @@
                         <page string="Nomenclature">
                             <group>
                                 <group string="Mandatory Levels" >
-                                    <field name="nomen_manda_0" />
-                                    <field name="nomen_manda_1" />
-                                    <field name="nomen_manda_2" />
-                                    <field name="nomen_manda_3" />
+                                    <field name="nomen_manda_0" domain="[('parent_id', '=', False)]"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="nomen_manda_1"
+                                           domain="[('parent_id', '!=', False),('parent_id', '=', nomen_manda_0)]"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="nomen_manda_2"
+                                           domain="[('parent_id', '!=', False),('parent_id', '=', nomen_manda_1)]"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="nomen_manda_3"
+                                           domain="[('parent_id', '!=', False),('parent_id', '=', nomen_manda_2)]"
+                                           options="{'no_create': True, 'no_open': True}"/>
                                 </group>
                                 <group string="Optional Levels">
                                     <field name="nomen_sub_0" />
@@ -186,7 +193,7 @@
                         <page string="Procurement &amp; Locations">
                             <group>
                                 <group string="Delays" >
-                                    <field name="procure_delays" />
+<!--                                    <field name="procure_delays" />-->
                                 </group>
                                 <group/>
                             </group>
