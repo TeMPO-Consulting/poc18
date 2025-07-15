@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Template Product Labels -->
+    <template id="product_labels_product">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-if="o.company_id" t-set="company" t-value="o.company_id"/>
+                <t t-call="web.basic_layout">
+                    <link rel="stylesheet" type="text/css" href="/msf_product/static/css/report_styles.css"/>
+
+                    <!-- SET VARIABLES (Depending on model) -->
+                    <t t-if="doc_model == 'product.product'">
+                        <t t-set="product_code" t-value="o.default_code"/>
+                        <t t-set="product_desc" t-value="o.name"/>
+                        <t t-set="prodlot" t-value="False"/>
+                        <t t-set="exp_date" t-value="False"/>
+                    </t>
+                    <t t-elif="doc_model == 'stock.production.lot'">
+                        <t t-set="product_code" t-value="o.product_id.default_code"/>
+                        <t t-set="product_desc" t-value="o.product_id.name"/>
+                        <t t-set="prodlot" t-value="o.name"/>
+                        <t t-set="exp_date" t-value="o.life_date"/>
+                    </t>
+                    <t t-elif="doc_model == 'stock.card.wizard'">
+                        <t t-set="product_code" t-value="o.product_id.default_code"/>
+                        <t t-set="product_desc" t-value="o.product_id.name"/>
+                        <t t-set="prodlot" t-value="False if not o.prodlot_id else o.prodlot_id.name"/>
+                        <t t-set="exp_date" t-value="False if not o.prodlot_id else o.prodlot_id.life_date"/>
+                    </t>
+                    <t t-else="">
+                        <t t-set="product_code" t-value="False"/>
+                        <t t-set="product_desc" t-value="False"/>
+                        <t t-set="prodlot" t-value="False"/>
+                        <t t-set="exp_date" t-value="False"/>
+                    </t>
+                    <!-- LABELS -->
+                    <t t-foreach="[0,0,'last']" t-as="i">
+                        <!-- Product name and logos -->
+                        <div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <img src="/msf_product/static/img/msf.png" />
+                                </div>
+                                <div class="col-6">
+                                    <p class="BigLines" t-out="product_code"/>
+                                </div>
+                                <div class="col-3">
+                                    <img src="/msf_product/static/img/unifield.png" />
+                                </div>
+                            </div>
+                        </div>
+                        <p class="WhiteSpace">
+                            <font color="white"> </font>
+                        </p>
+                        <!-- Batch numbers and expiry -->
+                        <div t-if="prodlot or exp_date">
+                            <div class="row">
+                                <div class="col">
+                                    <p class="BigLines"/>
+                                </div>
+                                <div t-if="prodlot" class="col-2">
+                                    <p class="BoldRightLines">Btch nr</p>
+                                </div>
+                                <div t-if="prodlot" class="col-4">
+                                    <p class="LeftLines" t-out="prodlot"/>
+                                </div>
+                                <div t-if="exp_date" class="col-2">
+                                    <p class="BoldRightLines">Expiry</p>
+                                </div>
+                                <div t-if="exp_date" class="col-2">
+                                    <p class="RightLines" t-out="exp_date"/>
+                                </div>
+                                <div class="col">
+                                    <p class="BigLines"/>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="Standard">
+                            <font color="white"> </font>
+                        </p>
+                        <!-- Product description -->
+                        <div>
+                            <div class="row">
+                                <div class="col"/>
+                                <div class="col-10 align-center">
+                                    <p class="HugeLines" t-out="product_desc"/>
+                                </div>
+                                <div class="col"/>
+                            </div>
+                        </div>
+                        <!-- Separator -->
+                        <t t-if="i != 'last'">
+                            <p class="BigWhiteSpace"/>
+                            <div>
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="HugeLines">--------------------------------------------------------</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="WhiteSpace"/>
+                        </t>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
