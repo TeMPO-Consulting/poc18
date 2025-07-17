@@ -146,7 +146,7 @@ class model_columns(osv.osv_memory):
             if type == "one2many" and not is_compute:
                 attributes.insert(1, ('inverse_name', f'"{field_data._fields_id}"'))
             # Many2one
-            if type == "Many2one" and field_data.ondelete:
+            if type == "many2one" and field_data.ondelete:
                 attributes.insert(1, ('ondelete', f'"{field_data.ondelete}"'))
             # Relational
             if type in ["many2one", "one2many", "many2many"]:
