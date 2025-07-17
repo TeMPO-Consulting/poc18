@@ -12,6 +12,7 @@
 
         "views/product_nomenclature_views.xml",
         "views/product_product_views.xml",
+        "views/product_purchase_views.xml",
         "views/uom_views.xml",
 
         "menus/supply_configuration_menus.xml",

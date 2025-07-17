@@ -55,7 +55,7 @@ class ProductNomenclature(models.Model):
     @api.depends('parent_id.level')
     def _compute_level(self):
         for record in self:
-            current_level = 0 if not record.parent_id else  record.parent_id.level + 1
+            current_level = 0 if not record.parent_id else record.parent_id.level + 1
             if current_level > _LEVELS:
                 raise ValidationError(_('The selected nomenclature should not be proposed.'))
             if current_level == _LEVELS and record.type == "mandatory":
@@ -67,8 +67,6 @@ class ProductNomenclature(models.Model):
         """"""
         for nomen in self:
             complete_name = nomen.name
-            if nomen.parent_id:
-                complete_name = f"{nomen.parent_id.name} | {complete_name}"
             nomen.complete_name = complete_name
 
     def _getNumberOfProducts(self):
@@ -93,10 +91,19 @@ class ProductNomenclature(models.Model):
     def _get_nomen_s(self):
         """"""
         for nomen in self:
-            nomen.nomen_manda_0_s = nomen if nomen.level == 0 else None
-            nomen.nomen_manda_1_s = nomen if nomen.level == 1 else None
-            nomen.nomen_manda_2_s = nomen if nomen.level == 2 else None
-            nomen.nomen_manda_3_s = nomen if nomen.level == 3 else None
+            current_nomen = nomen
+            for level in range(3, -1, -1):
+                if level == 3:
+                    nomen.nomen_manda_3_s = None if nomen.level < level else current_nomen
+                if level == 2:
+                    nomen.nomen_manda_2_s = None if nomen.level < level else current_nomen
+                if level == 1:
+                    nomen.nomen_manda_1_s = None if nomen.level < level else current_nomen
+                if level == 0:
+                    nomen.nomen_manda_0_s = None if nomen.level < level else current_nomen
+
+                if current_nomen and current_nomen.level == level:
+                    current_nomen = None if not current_nomen.parent_id else current_nomen.parent_id
 
     # Search methods
     def _search_complete_name(self, operator, value):

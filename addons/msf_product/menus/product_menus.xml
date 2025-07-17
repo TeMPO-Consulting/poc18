@@ -12,4 +12,11 @@
               action="product_product_view_action"
               parent="menu_products"
               sequence="10"/>
+
+    <menuitem id="product_purchases_menu"
+              name="Product Purchases"
+              action="product_purchase_view_action"
+              parent="menu_products"
+              sequence="20"/>
+
 </odoo>
