@@ -9,9 +9,12 @@
             <field name="arch" type="xml">
                 <form string="Model fields">
                     <group col="8">
-                        <field name="model_name" on_change="onchange_model_name(model_name)" colspan="8"/>
+                        <field name="model_name" on_change="onchange_model_name(model_name,method_name)" colspan="8"/>
+                        <field name="method_name" on_change="onchange_model_name(model_name,method_name)"/>
+
                         <field name="fields" colspan="8"/>
                         <field name="placeholder_methods" colspan="8"/>
+                        <field name="method_inheritance_chain" colspan="8"/>
                     </group>
                 </form>
             </field>

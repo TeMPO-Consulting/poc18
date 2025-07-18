@@ -49,7 +49,37 @@ class model_columns(osv.osv_memory):
         result = result.rsplit('#', 1)[0]
         return result
 
-    def onchange_model_name(self, cr, uid, ids, model_name, context=None):
+    def get_method_inheritance_chain(self, model_obj, method_name, res):
+        """
+        Retrieve all method overrides in order of execution for a given method and Odoo model
+        """
+        # Check if method name is valid for object
+        if not hasattr(model_obj, method_name):
+            res["value"]["method_inheritance_chain"] = f"No method called '{method_name}' found for this class"
+            return
+        # Retrieve all override methods
+        method_string = ""
+        parent_classes = inspect.getmro(model_obj.__class__)
+        for parent_class in parent_classes:
+            # Break when hitting first base framework class
+            if str(parent_class) == "<class 'osv.osv.osv'>":
+                break
+            # Skip base class used repeatedly for odoo class inheritance resolution
+            if str(parent_class.__module__) == "osv.osv":
+                continue
+            # Check if override version is present in source
+            # (otherwise inspect.getsource returns base class method code regardless of whether
+            # the class actually overrides the method or not)
+            if not f"def {method_name}" in inspect.getsource(parent_class):
+                continue
+            method_string += f"====== CLASS ======\n"
+            method_string += f"{parent_class}\n\n"
+            method_string += f"{inspect.getsource(getattr(parent_class, method_name))}\n\n"
+
+        res["value"]["method_inheritance_chain"] = method_string
+
+
+    def onchange_model_name(self, cr, uid, ids, model_name=None, method_name=None, context=None):
         """
         """
         if context is None:
@@ -58,6 +88,7 @@ class model_columns(osv.osv_memory):
         res = {
             'value': {}
         }
+
         # Check model_name
         if not model_name:
             res["value"]["columns"] = "Type in model name and click away"
@@ -66,10 +97,16 @@ class model_columns(osv.osv_memory):
         # Search for model name
         model_obj = self.pool.get(model_name)
         if not model_obj:
-            res["value"]["columns"] = "Model not found."
             res["value"]["fields"] = "Model not found."
+            res["value"]["placeholder_methods"] = "Model not found."
+            res["value"]["method_inheritance_chain"] = "Model not found."
             return res
 
+        # == CRUD METHODS ==
+        if method_name:
+            self.get_method_inheritance_chain(model_obj, method_name, res)
+
+        # == COLUMNS TO FIELDS ==
         # Process model columns
         columns = model_obj._columns
         # String containing new fields definitions
@@ -236,6 +273,14 @@ class model_columns(osv.osv_memory):
         'model_name': fields.char(
             size=128,
             string='Model name',
+        ),
+        'method_name': fields.char(
+            size=128,
+            string='Method name',
+        ),
+        'method_inheritance_chain': fields.text(
+            string='Method Inheritance',
+            readonly=True,
         ),
     }
 
